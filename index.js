@@ -38,6 +38,7 @@ http.createServer((req, res) => {
         obj.denVTydnuCesky = DNY_V_TYDNU[d.getDay()] + " ";
         obj.datumCesky = d.getDate() + "." + (d.getMonth()+1) + "." + d.getFullYear();
         obj.datumCeskyFormat = dateFormat(d, "dd.mm.yyyy");
+        obj.casFormat = dateFormat(d, "hh:mm:ss");
         obj.casCesky = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
         res.end(JSON.stringify(obj));
     }
