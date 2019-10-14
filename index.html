@@ -5,6 +5,7 @@
     <title>Moje single page application</title>
     <script>
         function nactisvatky (){
+            setInterval(seznamzprav, 1000);
             document.getElementById("kalendar").valueAsDate = new Date();
             svatekdledata();
             fetch("http://localhost:150/svatky").then(function(response) {
@@ -25,6 +26,27 @@
                 });
             });
         }
+        function poslizpravu(){
+                let chatmsg = document.getElementById("chatmsg").value;
+                fetch("http://localhost:150/chat/addmsg?msg="+chatmsg).then(function(response) {
+                    response.text().then(function(text) {
+                        let obj = JSON.parse(text);
+                    });
+                });
+        }
+        function seznamzprav() {
+            let chatmsg = document.getElementById("chatmsg").value;
+            fetch("http://localhost:150/chat/listmsgs").then(function (response) {
+                response.text().then(function (text) {
+                    let obj = JSON.parse(text);
+                    let s = "";
+                    for (let o of obj.messages) {
+                        s = s + o.time + "<br>" + o.text + "<br>";
+                    }
+                    document.getElementById("chatmsgs").innerHTML = s;
+                });
+            });
+        }
     </script>
 </head>
 <body onload = nactisvatky() style="background-color: aqua">
@@ -33,10 +55,12 @@
 <span style="font-size: 20px"> Dnes je <span id = "datum">...</span>, svátek má <span id="svatek">...</span>.
     <br>Zítra má svátek <span id = "svatekZitra"></span>. Toník má svátek 13. června.</br></span>
 <br>
-
+<h1>Chat</h1>
+<div id = "chatmsgs"></div>
+<input type="text" id="chatmsg"><input type="button" value = "Odešli" onclick = "poslizpravu()">
+<br><br>
 <input type="date" id ="kalendar" onchange = "svatekdledata()"> má svátek <span id="svatek3">...</span>.
-<br>
-<br>
+<br><br>
 <img src= "borci.jpg" width="500">
 <br>
 <b>Tohle jsou mega borci</b>

@@ -22,6 +22,9 @@ SVATKY[12] = [ "",'Iva', 'Blanka', 'Svatoslav', 'Barbora', 'Jitka', 'Mikuláš',
 let citac = 0;
 let druhejcitac = 0;
 
+let msgs =  new Array();
+
+
 function processStaticFiles(res, fileName){
     fileName = fileName.substr(1); //zkopiruju od druheho znaku
     console.log(fileName);
@@ -106,6 +109,20 @@ http.createServer((req, res) => {
             obj.svatekZitra = SVATKY[d.getMonth()+1][d.getDate()+1];
             obj.svatekVcera = SVATKY[d.getMonth()+1][d.getDate()-1];
         }
+        res.end(JSON.stringify(obj));
+    }
+    else if (q.pathname == "/chat/listmsgs"){
+        res.writeHead(200, {"Content-type": "application/json"});
+        let obj = {};
+        obj.messages = msgs;
+        res.end(JSON.stringify(obj));
+    }
+    else if (q.pathname == "/chat/addmsg") {
+        res.writeHead(200, {"Content-type": "application/json"});
+        let obj = {};
+        obj.text = q.query["msg"];
+        obj.time = new Date();
+        msgs.push(obj);
         res.end(JSON.stringify(obj));
     }
     else{
