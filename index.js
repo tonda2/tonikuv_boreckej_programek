@@ -1,6 +1,8 @@
 const http = require("http");
 const dateFormat = require("dateformat");
 const fs = require('fs');
+const url = require('url');
+
 const DNY_V_TYDNU = ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota"];
 const SVATKY = new Array();
 SVATKY[1] = [ "", 'Nový rok', 'Karina', 'Radmila', 'Diana', 'Dalimil', 'Tři králové', 'Vilma', 'Čestmír', 'Vladan', 'Břetislav', 'Bohdana', 'Pravoslav', 'Edita', 'Radovan', 'Alice', 'Ctirad', 'Drahoslav', 'Vladislav', 'Doubravka', 'Ilona', 'Běla', 'Slavomír', 'Zdeněk', 'Milena', 'Miloš', 'Zora', 'Ingrid', 'Otýlie', 'Zdislava', 'Robin', 'Marika'];
@@ -45,20 +47,21 @@ function processStaticFiles(res, fileName){
 }
 
 http.createServer((req, res) => {
+    let q = url.parse(req.url, true);
     if (req.url == "/") {
         citac++;
         processStaticFiles(res, "/index.html");
         return;
     }
-    if (req.url.length - req.url.lastIndexOf(".") < 6){
+    if (q.pathname.length - q.pathname.lastIndexOf(".") < 6){
         processStaticFiles(res, req.url);
         return;
     }
-    if (req.url == "/jinastranka") {
+    if (q.pathname == "/jinastranka") {
         res.writeHead(200, {"Content-type": "text/html"});
         res.end("<html lang='cs'><head><meta charset = 'UTF8'></head><body>objevils super tajnou wwebku kamo</body></html>");
     }
-    else if (req.url == "/jsondemo"){
+    else if (q.pathname == "/jsondemo"){
         res.writeHead(200, {"Content-type": "application/json"});
         let obj = {};
         obj.jmeno = "Martin";
@@ -66,14 +69,14 @@ http.createServer((req, res) => {
         obj.rokNarozeni = 1847;
         res.end(JSON.stringify(obj));
     }
-    else if (req.url == "/jsoncitac"){
+    else if (q.pathname == "/jsoncitac"){
         res.writeHead(200, {"Content-type": "application/json"});
         let pocet = {};
         druhejcitac ++;
         pocet.cislo = druhejcitac;
         res.end(JSON.stringify(pocet));
     }
-    else if (req.url == "/denvtydnu"){
+    else if (q.pathname == "/denvtydnu"){
         res.writeHead(200, {"Content-type": "application/json", "Access-Control-Allow-Origin":"*"});
         let d = new Date();
         let obj = {};
@@ -86,15 +89,23 @@ http.createServer((req, res) => {
         obj.casCesky = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
         res.end(JSON.stringify(obj));
     }
-    else if (req.url == "/svatky"){
+    else if (q.pathname == "/svatky"){
         res.writeHead(200, {"Content-type": "application/json", "Access-Control-Allow-Origin":"*"});
-        let d = new Date();
         let obj = {};
-        obj.systDatum = d;
-        obj.datumCesky = d.getDate() + "." + (d.getMonth()+1) + "." + d.getFullYear();
-        obj.svatek = SVATKY[d.getMonth()+1][d.getDate()];
-        obj.svatekZitra = SVATKY[d.getMonth()+1][d.getDate()+1];
-        obj.svatekVcera = SVATKY[d.getMonth()+1][d.getDate()-1];
+        if (q.query["m"] && q.query["d"]){
+            let d = q.query["d"];
+            let m = q.query["m"];
+            obj.datum = d+"."+m+".";
+            obj.svatek = SVATKY[m][d];
+        }
+        else{
+            let d = new Date();
+            obj.systDatum = d;
+            obj.datumCesky = d.getDate() + "." + (d.getMonth()+1) + "." + d.getFullYear();
+            obj.svatek = SVATKY[d.getMonth()+1][d.getDate()];
+            obj.svatekZitra = SVATKY[d.getMonth()+1][d.getDate()+1];
+            obj.svatekVcera = SVATKY[d.getMonth()+1][d.getDate()-1];
+        }
         res.end(JSON.stringify(obj));
     }
     else{

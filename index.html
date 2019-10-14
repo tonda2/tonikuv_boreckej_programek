@@ -5,12 +5,23 @@
     <title>Moje single page application</title>
     <script>
         function nactisvatky (){
+            document.getElementById("kalendar").valueAsDate = new Date();
+            svatekdledata();
             fetch("http://localhost:150/svatky").then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                     document.getElementById("datum").innerHTML = obj.datumCesky;
                     document.getElementById("svatek").innerHTML = obj.svatek;
                     document.getElementById("svatekZitra").innerHTML = obj.svatekZitra;
+                });
+            });
+        }
+        function svatekdledata (){
+            let d = document.getElementById("kalendar").valueAsDate;
+            fetch("http://localhost:150/svatky?d="+d.getDate()+"&m="+(d.getMonth()+1)).then(function(response) {
+                response.text().then(function(text) {
+                    let obj = JSON.parse(text);
+                    document.getElementById("svatek3").innerHTML = obj.svatek;
                 });
             });
         }
@@ -22,7 +33,13 @@
 <span style="font-size: 20px"> Dnes je <span id = "datum">...</span>, svátek má <span id="svatek">...</span>.
     <br>Zítra má svátek <span id = "svatekZitra"></span>. Toník má svátek 13. června.</br></span>
 <br>
+
+<input type="date" id ="kalendar" onchange = "svatekdledata()"> má svátek <span id="svatek3">...</span>.
+<br>
+<br>
 <img src= "borci.jpg" width="500">
+<br>
+<b>Tohle jsou mega borci</b>
 
 </body>
 </html>
