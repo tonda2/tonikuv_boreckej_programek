@@ -2,10 +2,7 @@ const url = require('url');
 let msgs =  new Array();
 
 exports.apiChat = function(req, res){
-    res.writeHead(200, {
-        "Content-type": "application/json",
-        "Access-Control-Allow-Origin":"*"
-    });
+    res.writeHead(200, {"Content-type": "application/json", "Access-Control-Allow-Origin":"*"});
     let q = url.parse(req.url, true);
     if (q.pathname == "/chat/listmsgs"){
         res.writeHead(200, {"Content-type": "application/json"});
