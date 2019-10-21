@@ -28,10 +28,13 @@
         }
         function poslizpravu(){
                 let chatmsg = document.getElementById("chatmsg").value;
-                fetch("http://localhost:150/chat/addmsg?msg="+chatmsg).then(function(response) {
+                let prezdivka = document.getElementById("prezdivka").value;
+                fetch("http://localhost:150/chat/addmsg?msg="+prezdivka+": "+chatmsg).then(function(response) {
                     response.text().then(function(text) {
                         let obj = JSON.parse(text);
                     });
+                    document.getElementById("chatmsg").value = "";
+                    document.getElementById("prezdivka").value = "";
                 });
         }
         function seznamzprav() {
@@ -47,6 +50,11 @@
                 });
             });
         }
+        function enter(){
+            if (event.keyCode === 13) {
+                poslizpravu();
+            }
+        }
     </script>
 </head>
 <body onload = nactisvatky() style="background-color: aqua">
@@ -57,7 +65,9 @@
 <br>
 <h1>Chat</h1>
 <div id = "chatmsgs"></div>
-<input type="text" id="chatmsg"><input type="button" value = "Odešli" onclick = "poslizpravu()">
+<input type="text"  id="prezdivka" placeholder="Přezdívka">
+<br>
+<input type="text"  id="chatmsg" onkeydown="enter()" placeholder="Zpráva"><input type="button" value = "Odešli" onclick = "poslizpravu()">
 <br><br>
 <input type="date" id ="kalendar" onchange = "svatekdledata()"> má svátek <span id="svatek3">...</span>.
 <br><br>
