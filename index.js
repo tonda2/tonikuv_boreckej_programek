@@ -4,7 +4,8 @@ const fs = require('fs');
 const url = require('url');
 const apiDenVTydnu = require('./api-denvtydnu').apiDenVTydnu;
 const apiSvatky = require('./api-svatky').apiSvatky;
-const apiChat= require('./api-chat').apiChat;
+const apiChat = require('./api-chat').apiChat;
+const apicislo = require('./api-cislo').apicislo;
 
 let citac = 0;
 let druhejcitac = 0;
@@ -50,6 +51,8 @@ http.createServer((req, res) => {
     if (q.pathname == "/jinastranka") {
         res.writeHead(200, {"Content-type": "text/html"});
         res.end("<html lang='cs'><head><meta charset = 'UTF8'></head><body>objevils super tajnou wwebku kamo</body></html>");
+    } else if (q.pathname == "/cislo") {
+        apicislo(req, res);
     }
     else if (q.pathname == "/jsondemo"){
         res.writeHead(200, {"Content-type": "application/json"});
