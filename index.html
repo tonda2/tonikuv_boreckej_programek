@@ -32,24 +32,27 @@
                     let obj = JSON.parse(text);
                     document.getElementById("nahodnecislo").innerHTML = obj.nahodnecislo;
                 });
-                let input = document.getElementById("vstup").value;
-                if (input === nahodnecislo){
-                    document.getElementById("porovnani").innerHTML = "Správně!";
-                }
-                else{
-                    document.getElementById("porovnani").innerHTML = "Špatně!";
-                }
+            });
+            zkontrolujcislo();
+        }
+        function zkontrolujcislo() {
+            let hadani = document.getElementById("hadani").value;
+            fetch("http://localhost:150/cislo/zkontroluj?c=" + hadani).then(function (response) {
+                response.text().then(function (text) {
+                    let obj = JSON.parse(text);
+                    document.getElementById("stav").innerHTML = obj.rozhodnuti;
+                });
             });
         }
         function poslizpravu(){
-                let chatmsg = document.getElementById("chatmsg").value;
-                let prezdivka = document.getElementById("prezdivka").value;
-                fetch("http://localhost:150/chat/addmsg?msg="+prezdivka+": "+chatmsg).then(function(response) {
-                    response.text().then(function(text) {
-                        let obj = JSON.parse(text);
-                    });
-                    document.getElementById("chatmsg").value = "";
+            let chatmsg = document.getElementById("chatmsg").value;
+            let prezdivka = document.getElementById("prezdivka").value;
+            fetch("http://localhost:150/chat/addmsg?msg="+prezdivka+": "+chatmsg).then(function(response) {
+                response.text().then(function(text) {
+                    let obj = JSON.parse(text);
                 });
+                document.getElementById("chatmsg").value = "";
+            });
         }
         function seznamzprav() {
             let chatmsg = document.getElementById("chatmsg").value;
@@ -87,11 +90,11 @@
 <br><br>
 <b style = "color:green"> Zkus uhádnout moje číslíčko od 5 do 10 :)</b>
 <br>
-<input type="text"  id="vstup" placeholder="Hádej">
+<input type="text"  id="hadani" placeholder="Hádej">
 <input type="button" value = "Odešli" onclick = "vybercislo()">
 <span>Nahodne cislo je </span><span id="nahodnecislo">....</span>
 <br>
-<span id="porovnani"></span>
+Je to: <span id="stav"></span>
 <br><br>
 <img src= "borci.jpg" width="500">
 <br>

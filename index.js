@@ -51,7 +51,7 @@ http.createServer((req, res) => {
     if (q.pathname == "/jinastranka") {
         res.writeHead(200, {"Content-type": "text/html"});
         res.end("<html lang='cs'><head><meta charset = 'UTF8'></head><body>objevils super tajnou wwebku kamo</body></html>");
-    } else if (q.pathname == "/cislo") {
+    } else if (q.pathname.startsWith("/cislo")) {
         apicislo(req, res);
     }
     else if (q.pathname == "/jsondemo"){
