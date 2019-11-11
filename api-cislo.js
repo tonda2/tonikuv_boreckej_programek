@@ -1,5 +1,5 @@
 const url = require('url');
-let nc
+let nc;
 
 exports.apicislo = function(req, res) {
     let q = url.parse(req.url, true);
