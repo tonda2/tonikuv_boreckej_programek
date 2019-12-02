@@ -1,6 +1,7 @@
 const DNY_V_TYDNU = ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota"];
 const dateFormat = require("dateformat");
 
+
 exports.apiDenVTydnu = function(req, res){
     res.writeHead(200, {"Content-type": "application/json", "Access-Control-Allow-Origin":"*"});
     let d = new Date();

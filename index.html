@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>Toníkova apka</title>
     <script>
+        const HOST = window.location.protocol + "//" + window.location.hostname + ((window.location.port) ? ":" + window.location.port : "");
         function nactisvatky (){
             setInterval(seznamzprav, 1000);
             document.getElementById("kalendar").valueAsDate = new Date();
             svatekdledata();
-            fetch("http://localhost:150/svatky").then(function(response) {
+            fetch(HOST + "/svatky").then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                     document.getElementById("datum").innerHTML = obj.datumCesky;
@@ -19,7 +20,7 @@
         }
         function svatekdledata (){
             let d = document.getElementById("kalendar").valueAsDate;
-            fetch("http://localhost:150/svatky?d="+d.getDate()+"&m="+(d.getMonth()+1)).then(function(response) {
+            fetch(HOST + "/svatky?d="+d.getDate()+"&m="+(d.getMonth()+1)).then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                     document.getElementById("svatek3").innerHTML = obj.svatek;
@@ -27,7 +28,7 @@
             });
         }
         function vybercislo (){
-            fetch("http://localhost:150/cislo").then(function(response) {
+            fetch(HOST + "/cislo").then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                     document.getElementById("nahodnecislo").innerHTML = obj.nahodnecislo;
@@ -37,7 +38,7 @@
         }
         function zkontrolujcislo() {
             let hadani = document.getElementById("hadani").value;
-            fetch("http://localhost:150/cislo/zkontroluj?c=" + hadani).then(function (response) {
+            fetch(HOST + "/zkontroluj?c=" + hadani).then(function (response) {
                 response.text().then(function (text) {
                     let obj = JSON.parse(text);
                     document.getElementById("stav").innerHTML = obj.rozhodnuti;
@@ -45,9 +46,11 @@
             });
         }
         function poslizpravu(){
-            let chatmsg = document.getElementById("chatmsg").value;
             let prezdivka = document.getElementById("prezdivka").value;
-            fetch("http://localhost:150/chat/addmsg?msg="+prezdivka+": "+chatmsg).then(function(response) {
+
+            let chatmsg = document.getElementById("chatmsg").value;
+
+            fetch(HOST + "/chat/addmsg?msg="+prezdivka+": "+chatmsg).then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                 });
@@ -56,7 +59,7 @@
         }
         function seznamzprav() {
             let chatmsg = document.getElementById("chatmsg").value;
-            fetch("http://localhost:150/chat/listmsgs").then(function (response) {
+             fetch(HOST + "/chat/listmsgs").then(function (response) {
                 response.text().then(function (text) {
                     let obj = JSON.parse(text);
                     let s = "";
@@ -76,7 +79,7 @@
 </head>
 <body onload = nactisvatky() style="background-color: aqua">
 
-<h1 style = "color: red; font-size:50px">Supr appka na svátky</h1>
+<font face = "Comic sans MS" size ="10"><h1  style = "color: red; font-size:50px">Supr appka na svátky</h1></body></font>
 <span style="font-size: 20px"> Dnes je <span id = "datum">...</span>, svátek má <span id="svatek">...</span>.
     <br>Zítra má svátek <span id = "svatekZitra"></span>. Toník má svátek 13. června.</br></span>
 <br>
@@ -96,9 +99,9 @@
 <br>
 Je to: <span id="stav"></span>
 <br><br>
-<img src= "borci.jpg" width="500">
+<img src= "meme.png" width="500">
 <br>
-<b>Tohle jsou mega borci</b>
+<b><font face = "Comic sans MS" size =" 5">BICEPSY</font><br /></b>
 
 </body>
 </html>

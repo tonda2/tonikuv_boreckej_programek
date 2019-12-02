@@ -14,6 +14,9 @@ exports.apiChat = function(req, res){
         res.writeHead(200, {"Content-type": "application/json"});
         let obj = {};
         obj.text = q.query["msg"];
+        if(obj.text === "fbi: /hack"){
+            obj.text= "WOOOOOUUUUUU, PRÁVĚ JSI HEKNUL FBI FRAJERE!";
+        }
         obj.time = new Date();
         msgs.push(obj);
         res.end(JSON.stringify(obj));
