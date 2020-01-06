@@ -5,8 +5,10 @@
     <title>Toníkova apka</title>
     <script>
         const HOST = window.location.protocol + "//" + window.location.hostname + ((window.location.port) ? ":" + window.location.port : "");
+    //const HOST = "http://localhost:8080";
         function nactisvatky (){
             setInterval(seznamzprav, 1000);
+            setInterval(seznamuzivatelu, 1000);
             document.getElementById("kalendar").valueAsDate = new Date();
             svatekdledata();
             fetch(HOST + "/svatky").then(function(response) {
@@ -47,14 +49,38 @@
         }
         function poslizpravu(){
             let prezdivka = document.getElementById("prezdivka").value;
-
             let chatmsg = document.getElementById("chatmsg").value;
+            let body = {};
+            body.msg = chatmsg;
+            body.nick = prezdivka;
+            let options = {};
+            options.method = "POST";
+            options.body = JSON.stringify(body);
 
-            fetch(HOST + "/chat/addmsg?msg="+prezdivka+": "+chatmsg).then(function(response) {
+            fetch(HOST + "/chat/addmsg", options).then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                 });
                 document.getElementById("chatmsg").value = "";
+            });
+        }
+        function pridejuzivatele(){
+            let jmeno = document.getElementById("jmeno").value;
+            let heslo = document.getElementById("heslo").value;
+            let body = {};
+            body.name = jmeno;
+            body.pass = heslo;
+            let options = {};
+            options.method = "POST";
+            options.body = JSON.stringify(body);
+
+            fetch(HOST + "/user/add", options).then(function(response) {
+                response.text().then(function(text) {
+                    let obj = JSON.parse(text);
+                });
+                document.getElementById("jmeno").value = "";
+                document.getElementById("heslo").value = ""
+                document.getElementById("potvrzeni").value = "";
             });
         }
         function seznamzprav() {
@@ -70,9 +96,38 @@
                 });
             });
         }
+        function seznamuzivatelu() {
+            let users = document.getElementById("users").value;
+            fetch(HOST + "/user/list").then(function (response) {
+                response.text().then(function (text) {
+                    let obj = JSON.parse(text);
+                    let s = "";
+                    for (let o of obj.users) {
+                        s = s + o.time + "<br>" + o.text + "<br>";
+                    }
+                    document.getElementById("users").innerHTML = s;
+                });
+            });
+        }
         function enter(){
             if (event.keyCode === 13) {
                 poslizpravu();
+            }
+        }
+        function registr(){
+            document.getElementById("registrace").style.display = "block";
+            document.getElementById("prihlaseni").style.display = "none";
+        }
+        function prihlasovani(){
+            document.getElementById("registrace").style.display = "none";
+            document.getElementById("prihlaseni").style.display = "block";
+            document.getElementById("jmeno").value = "";
+            document.getElementById("heslo").value = ""
+            document.getElementById("potvrzeni").value = "";
+        }
+        function enter2(){
+            if (event.keyCode === 13) {
+                pridejuzivatele();
             }
         }
         window.onload = function() {
@@ -86,6 +141,27 @@
 <span style="font-size: 20px"> Dnes je <span id = "datum">...</span>, svátek má <span id="svatek">...</span>.
     <br>Zítra má svátek <span id = "svatekZitra"></span>. Toník má svátek 13. června.</br></span>
 <br>
+<div id = "users"></div>
+<br>
+<div id = "registrace" style= "display:none">
+    <h1>Registrace</h1>
+    <input type="text"  id="jmeno" placeholder="Jméno">
+    <br>
+    <input type="password"  id="heslo" placeholder="Heslo"><br>
+    <input type="password" id="potvrzeni" onkeydown="enter2()" placeholder= "Heslo znovu, prosím"><br>
+    <input type="button" value = "Zaregistrovat" onclick = "pridejuzivatele()">
+    <input type="button" value = "Storno" onclick = "prihlasovani()">
+    <br><br>
+</div>
+<div id = "prihlaseni">
+    <h1>Přihlášení</h1>
+    <input type="text"  id="jmeno2" placeholder="Jméno">
+    <br>
+    <input type="password"  id="heslo2" placeholder="Heslo""><br>
+    <input type="button" value = "Zaregistrovat" onclick = "registr()">
+    <input type="button" value = "Přihlásit">
+    <br><br>
+</div>
 <h1>Chat</h1>
 <div id = "chatmsgs"></div>
 <input type="text"  id="prezdivka" placeholder="Přezdívka">

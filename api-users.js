@@ -1,18 +1,18 @@
 const url = require('url');
-let msgs =  new Array();
+let users =  new Array();
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
-exports.apiChat = function(req, res){
+exports.apiUsers = function(req, res){
     res.writeHead(200, {"Content-type": "application/json"});
     let q = url.parse(req.url, true);
-    if (q.pathname == "/chat/listmsgs"){
+    if (q.pathname == "/user/list"){
         res.writeHead(200, {"Content-type": "application/json"});
         let obj = {};
-        obj.messages = msgs;
+        obj.users = users;
         res.end(JSON.stringify(obj));
     }
-    else if (q.pathname == "/chat/addmsg") {
+    else if (q.pathname == "/user/add") {
         let data = "";
         req.on('data', function (chunk) {
             try {
@@ -26,9 +26,9 @@ exports.apiChat = function(req, res){
                 let body = JSON.parse(data);
                 res.writeHead(200, {"Content-type": "application/json"});
                 let obj = {};
-                obj.text = entities.encode(body.nick) + ": " + entities.encode(body.msg);
+                obj.text = entities.encode(body.name) + ": " + entities.encode(body.pass);
                 obj.time = new Date();
-                msgs.push(obj);
+                users.push(obj);
                 res.end(JSON.stringify(obj));
             };
         });

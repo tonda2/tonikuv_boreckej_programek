@@ -2,7 +2,7 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="dfdf30a7-acc8-4263-833f-587f44772571" name="rosti2" url="http://node-13.rosti.cz">
+      <webServer id="dfdf30a7-acc8-4263-833f-587f44772571" name="rosti2" url="node-13.rosti.cz">
         <fileTransfer host="node-13.rosti.cz" port="16343" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
