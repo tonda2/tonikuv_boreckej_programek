@@ -8,55 +8,22 @@ const apiChat = require('./api-chat').apiChat;
 const apiUsers = require('./api-users').apiUsers;
 const apicislo = require('./api-cislo').apicislo;
 const uniqid = require("uniqid");
+const createSpaServer = require("spaserver").createSpaServer;
 let citac = 0;
 let druhejcitac = 0;
 
 let msgs =  new Array();
 let mereni = new Array();
 
-function processStaticFiles(res, fileName){
-    fileName = fileName.substr(1); //zkopiruju od druheho znaku
-    console.log(fileName);
-    let contentType = "text/html";
-    if (fileName.endsWith(".png")){
-        contentType = "image/png";
-    }
-    else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")){
-        contentType = "image/jpeg";
-    }
-
-    if(fs.existsSync(fileName)){
-        fs.readFile(fileName, function(err, data) {
-            res.writeHead(200, {'Content-Type': contentType});
-            res.write(data);
-            res.end();
-        });
-    }
-    else {
-        res.writeHead(404);
-        res.end();
-    }
-}
-
-http.createServer((req, res) => {
-    let q = url.parse(req.url, true);
+function processApi(req, res) {
     let obj = {};
-    if (req.url == "/") {
-        citac++;
-        processStaticFiles(res, "/index.html");
-        return;
-    }
-    if (q.pathname.length - q.pathname.lastIndexOf(".") < 6){
-        processStaticFiles(res, req.url);
-        return;
-    }
-    if (q.pathname == "/jinastranka") {
+    if (req.pathname == "/jinastranka") {
         res.writeHead(200, {"Content-type": "text/html"});
         res.end("<html lang='cs'><head><meta charset = 'UTF8'></head><body>objevils super tajnou wwebku kamo</body></html>");
-    } else if (q.pathname.startsWith("/cislo")) {
+    } else if (req.pathname.startsWith("/cislo")) {
         apicislo(req, res);
     }
-    else if (q.pathname == "/jsondemo"){
+    else if (req.pathname == "/jsondemo"){
         res.writeHead(200, {"Content-type": "application/json"});
         let obj = {};
         obj.jmeno = "Martin";
@@ -64,32 +31,32 @@ http.createServer((req, res) => {
         obj.rokNarozeni = 1847;
         res.end(JSON.stringify(obj));
     }
-    else if (q.pathname == "/jsoncitac"){
+    else if (req.pathname == "/jsoncitac"){
         res.writeHead(200, {"Content-type": "application/json"});
         let pocet = {};
         druhejcitac ++;
         pocet.cislo = druhejcitac;
         res.end(JSON.stringify(pocet));
     }
-    else if (q.pathname == "/denvtydnu"){
+    else if (req.pathname == "/denvtydnu"){
         apiDenVTydnu(req, res);
     }
-    else if (q.pathname == "/svatky"){
+    else if (req.pathname == "/svatky"){
         apiSvatky(req, res);
     }
-    else if (q.pathname == "/chat/listmsgs"){
+    else if (req.pathname == "/chat/listmsgs"){
         apiChat(req, res);
     }
-    else if (q.pathname == "/chat/addmsg") {
+    else if (req.pathname == "/chat/addmsg") {
         apiChat(req, res);
     }
-    else if (q.pathname == "/user/add"){
+    else if (req.pathname == "/user/add"){
         apiUsers(req, res);
     }
-    else if (q.pathname == "/user/list"){
+    else if (req.pathname == "/user/list"){
         apiUsers(req, res);
     }
-    else if (q.pathname == "/start"){
+    else if (req.pathname == "/start"){
         let m = {};
         m.tmStart = new Date().getTime();
         let newId = uniqid();
@@ -99,7 +66,7 @@ http.createServer((req, res) => {
         obj.status = "Mereni zapocato";
         res.end(JSON.stringify(obj));
     }
-    else if (q.pathname == "/stop"){
+    else if (req.pathname == "/stop"){
         let tmStop = new Date().getTime();
         let q = url.parse(req.url, true);
         let id = q.query.id;
@@ -112,4 +79,6 @@ http.createServer((req, res) => {
         res.writeHead(200, {"Content-type": "text/html"});
         res.end("<html lang='cs'><head><meta charset = 'UTF8'></head><body>Počet volání: " +citac + "</body></html>");
     }
-}).listen(8080);
+}
+
+createSpaServer(8080, processApi);

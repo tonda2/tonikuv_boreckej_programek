@@ -6,12 +6,12 @@
     <script>
         const HOST = window.location.protocol + "//" + window.location.hostname + ((window.location.port) ? ":" + window.location.port : "");
     //const HOST = "http://localhost:8080";
-        function nactisvatky (){
+        function nactisvatky(){
             setInterval(seznamzprav, 1000);
             setInterval(seznamuzivatelu, 1000);
             document.getElementById("kalendar").valueAsDate = new Date();
             svatekdledata();
-            fetch(HOST + "/svatky").then(function(response) {
+           fetch(HOST + "/svatky").then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
                     document.getElementById("datum").innerHTML = obj.datumCesky;
@@ -77,6 +77,10 @@
             fetch(HOST + "/user/add", options).then(function(response) {
                 response.text().then(function(text) {
                     let obj = JSON.parse(text);
+
+                if (obj.error){
+                    alert(obj.error);
+                }
                 });
                 document.getElementById("jmeno").value = "";
                 document.getElementById("heslo").value = ""
@@ -103,11 +107,16 @@
                     let obj = JSON.parse(text);
                     let s = "";
                     for (let o of obj.users) {
-                        s = s + o.time + "<br>" + o.text + "<br>";
+                        s = s + o.login + " : "+ o.password + "<br>";
                     }
                     document.getElementById("users").innerHTML = s;
                 });
             });
+        }
+        function prihlas(){
+            if (obj.prihlaseno){
+                alert(obj.prihlaseno);
+            }
         }
         function enter(){
             if (event.keyCode === 13) {
@@ -135,7 +144,7 @@
         }
     </script>
 </head>
-<body onload = nactisvatky() style="background-color: aqua">
+<body onload = "nactisvatky()" style="background-color: aqua">
 
 <font face = "Comic sans MS" size ="10"><h1  style = "color: red; font-size:50px">Supr appka na svátky</h1></body></font>
 <span style="font-size: 20px"> Dnes je <span id = "datum">...</span>, svátek má <span id="svatek">...</span>.
@@ -159,7 +168,7 @@
     <br>
     <input type="password"  id="heslo2" placeholder="Heslo""><br>
     <input type="button" value = "Zaregistrovat" onclick = "registr()">
-    <input type="button" value = "Přihlásit">
+    <input type="button" value = "Přihlásit" onclick = "prihlas()">
     <br><br>
 </div>
 <h1>Chat</h1>

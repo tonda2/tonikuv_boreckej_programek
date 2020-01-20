@@ -1,36 +1,45 @@
 const url = require('url');
-let users =  new Array();
-const Entities = require('html-entities').AllHtmlEntities;
-const entities = new Entities();
+const fs = require('fs');
+const crypto = require("crypto");
 
-exports.apiUsers = function(req, res){
+let users = new Array();
+if (fs.existsSync("users.json")){
+    users = JSON.parse(fs.readFileSync("users.json"));
+}
+
+function rozbijheslo(pw) {
+    let mixpw = crypto.createHash("sha512").update(pw).digest("hex");
+    return mixpw;
+}
+
+
+exports.apiUsers = function(req, res) {
     res.writeHead(200, {"Content-type": "application/json"});
     let q = url.parse(req.url, true);
-    if (q.pathname == "/user/list"){
+    if (req.pathname == "/user/list") {
         res.writeHead(200, {"Content-type": "application/json"});
         let obj = {};
         obj.users = users;
         res.end(JSON.stringify(obj));
     }
-    else if (q.pathname == "/user/add") {
-        let data = "";
-        req.on('data', function (chunk) {
-            try {
-                data += chunk;
-            } catch (e) {
-                console.error(e);
+    else if (req.pathname == "/user/add"){
+        res.writeHead(200, {"Content-type": "application/json"});
+        let obj = {};
+        let userexists = false;
+        obj.login = req.parameters.name;
+        for (let u of users) {
+            if (u.login === obj.login) {
+                userexists = true;
+                break;
             }
-        })
-        req.on('end', function () {
-            if (data) {
-                let body = JSON.parse(data);
-                res.writeHead(200, {"Content-type": "application/json"});
-                let obj = {};
-                obj.text = entities.encode(body.name) + ": " + entities.encode(body.pass);
-                obj.time = new Date();
-                users.push(obj);
-                res.end(JSON.stringify(obj));
-            };
-        });
-    };
-};
+        }
+        if (userexists) {
+            obj.error = "Tak to asi nepude, frajírku! Takhle už se totiž někdo jmenuje :/";
+        } else {
+            obj.password = rozbijheslo(req.parameters.pass);
+            users.push(obj);
+            fs.writeFileSync("users.json", JSON.stringify(users, null, 2));
+        }
+        res.end(JSON.stringify(obj));
+
+    }};
