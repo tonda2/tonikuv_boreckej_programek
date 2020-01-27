@@ -3,9 +3,12 @@ const fs = require('fs');
 const crypto = require("crypto");
 
 let users = new Array();
-if (fs.existsSync("users.json")){
+if (fs.existsSync("users.json")) {
     users = JSON.parse(fs.readFileSync("users.json"));
+
 }
+
+let loggedUsers = new Array();
 
 function rozbijheslo(pw) {
     let mixpw = crypto.createHash("sha512").update(pw).digest("hex");
@@ -13,7 +16,7 @@ function rozbijheslo(pw) {
 }
 
 
-exports.apiUsers = function(req, res) {
+exports.apiUsers = function (req, res) {
     res.writeHead(200, {"Content-type": "application/json"});
     let q = url.parse(req.url, true);
     if (req.pathname == "/user/list") {
@@ -21,8 +24,7 @@ exports.apiUsers = function(req, res) {
         let obj = {};
         obj.users = users;
         res.end(JSON.stringify(obj));
-    }
-    else if (req.pathname == "/user/add"){
+    } else if (req.pathname == "/user/add") {
         res.writeHead(200, {"Content-type": "application/json"});
         let obj = {};
         let userexists = false;
@@ -42,4 +44,33 @@ exports.apiUsers = function(req, res) {
         }
         res.end(JSON.stringify(obj));
 
-    }};
+    } else if (req.pathname == "/login") {
+        res.writeHead(200, {"Content-type": "application/json"});
+        let obj = {};
+        let login = req.parameters.login;
+        let found = false;
+        obj.error = "asi ne, soráč";
+        for (let u of users) {
+            if (u.login === login) {
+                found = true;
+                if (u.password === rozbijheslo(req.parameters.password)) {
+                    obj.name = u.name;
+                    obj.error = null;
+                    let token = crypto.randomBytes(16).toString('hex'); //32 nahodnych znaku
+                    obj.token = token;
+                    let objLoggedUsers = {};
+                    objLoggedUsers.name = u.name;
+                    loggedUsers[token] = objLoggedUsers;
+                }
+                break;
+            }
+        }
+        res.end(JSON.stringify(obj));
+    }
+
+};
+
+exports.getLoggedUser = function (token) {
+    let u = loggedUsers[token];
+    return u;
+}

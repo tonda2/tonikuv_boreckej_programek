@@ -6,8 +6,8 @@
     <script>
         const HOST = window.location.protocol + "//" + window.location.hostname + ((window.location.port) ? ":" + window.location.port : "");
     //const HOST = "http://localhost:8080";
+        let token;
         function nactisvatky(){
-            setInterval(seznamzprav, 1000);
             setInterval(seznamuzivatelu, 1000);
             document.getElementById("kalendar").valueAsDate = new Date();
             svatekdledata();
@@ -89,12 +89,17 @@
         }
         function seznamzprav() {
             let chatmsg = document.getElementById("chatmsg").value;
-             fetch(HOST + "/chat/listmsgs").then(function (response) {
+             fetch(HOST + "/chat/listmsgs?token="+token).then(function (response) {
                 response.text().then(function (text) {
                     let obj = JSON.parse(text);
-                    let s = "";
-                    for (let o of obj.messages) {
-                        s = s + o.time + "<br>" + o.text + "<br>";
+                    if (obj.error){
+                        alert(obj.error);
+                    }
+                    else {
+                        let s = "";
+                        for (let o of obj.messages) {
+                            s = s + o.time + "<br>" + o.text + "<br>";
+                        }
                     }
                     document.getElementById("chatmsgs").innerHTML = s;
                 });
@@ -114,22 +119,45 @@
             });
         }
         function prihlas(){
-            if (obj.prihlaseno){
-                alert(obj.prihlaseno);
-            }
+            let body = {};
+            body.login = document.getElementById("jmeno").value;
+            body.password = document.getElementById("heslo").value;
+            let options = {};
+            options.method = "POST";
+            options.body = JSON.stringify(body);
+            fetch(HOST+"/users/login", options).then(function(response) {
+                response.text().then(function(text) {
+                    let obj = JSON.parse(text);
+                    if (obj.error) {
+                        alert(obj.error);
+                    } else {
+                        token = obj.token;
+                        document.getElementById("jmeno").innerHTML = obj.jmeno;
+                        setInterval(seznamzprav, 1000); //po 1s se bude aktualizovat seznam zprav chatu
+                        ukazChat();
+                    }
+                });
+            });
         }
         function enter(){
             if (event.keyCode === 13) {
                 poslizpravu();
             }
         }
+        function ukazChat(){
+            document.getElementById("registrace").style.display = "none";
+            document.getElementById("prihlaseni").style.display = "none";
+            document.getElementById("chatovani").style.display = "block";
+        }
         function registr(){
             document.getElementById("registrace").style.display = "block";
             document.getElementById("prihlaseni").style.display = "none";
+            document.getElementById("chatovani").style.display = "none";
         }
         function prihlasovani(){
             document.getElementById("registrace").style.display = "none";
             document.getElementById("prihlaseni").style.display = "block";
+            document.getElementById("chatovani").style.display = "none";
             document.getElementById("jmeno").value = "";
             document.getElementById("heslo").value = ""
             document.getElementById("potvrzeni").value = "";
@@ -146,7 +174,7 @@
 </head>
 <body onload = "nactisvatky()" style="background-color: aqua">
 
-<font face = "Comic sans MS" size ="10"><h1  style = "color: red; font-size:50px">Supr appka na svátky</h1></body></font>
+<font face = "Comic sans MS" size ="10"><h1  style = "color: red; font-size:50px">ČAU AHOJ</h1></body></font>
 <span style="font-size: 20px"> Dnes je <span id = "datum">...</span>, svátek má <span id="svatek">...</span>.
     <br>Zítra má svátek <span id = "svatekZitra"></span>. Toník má svátek 13. června.</br></span>
 <br>
@@ -171,12 +199,14 @@
     <input type="button" value = "Přihlásit" onclick = "prihlas()">
     <br><br>
 </div>
+<div id ="chatovani">
 <h1>Chat</h1>
-<div id = "chatmsgs"></div>
-<input type="text"  id="prezdivka" placeholder="Přezdívka">
-<br>
-<input type="text"  id="chatmsg" onkeydown="enter()" placeholder="Zpráva"><input type="button" value = "Odešli" onclick = "poslizpravu()">
-<br><br>
+    <div id = "chatmsgs"></div>
+    <input type="text"  id="prezdivka" placeholder="Přezdívka">
+    <br>
+    <input type="text"  id="chatmsg" onkeydown="enter()" placeholder="Zpráva"><input type="button" value = "Odešli" onclick = "poslizpravu()">
+    <br><br>
+</div>
 <input type="date" id ="kalendar" onchange = "svatekdledata()"> má svátek <span id="svatek3">...</span>.
 <br><br>
 <b style = "color:green"> Zkus uhádnout moje číslíčko od 5 do 10 :)</b>
